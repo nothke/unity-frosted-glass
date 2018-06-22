@@ -64,7 +64,7 @@ public class CommandBufferBlur : MonoBehaviour
         int numIterations = 4;
 
         float stepSize = blurStepDistance / _Camera.fieldOfView;
-        Vector2 offsets = new Vector2(stepSize * Screen.height / Screen.width, stepSize);
+        Vector2 offsets = new Vector2(stepSize * _Camera.pixelHeight / _Camera.pixelWidth, stepSize);
 
         
 
@@ -75,8 +75,8 @@ public class CommandBufferBlur : MonoBehaviour
             _CommandBuffer.Blit(BuiltinRenderTextureType.CurrentActive, screenCopyID);
 
             int curSize = (int)Mathf.Pow(2,i);
-            int curW = Screen.width/curSize;
-            int curH = Screen.height/curSize;
+            int curW = _Camera.pixelWidth/curSize;
+            int curH = _Camera.pixelHeight/curSize;
 
             int blurredID = Shader.PropertyToID("_Grab" + i + "_Temp1");
             int blurredID2 = Shader.PropertyToID("_Grab" + i + "_Temp2");
@@ -96,14 +96,14 @@ public class CommandBufferBlur : MonoBehaviour
 
         _Camera.AddCommandBuffer(CameraEvent.AfterSkybox, _CommandBuffer);
 
-        _ScreenResolution = new Vector2(Screen.width, Screen.height);
+        _ScreenResolution = new Vector2(_Camera.pixelWidth, _Camera.pixelHeight);
         _OldFov = _Camera.fieldOfView;
 		_OldStepDist = blurStepDistance;
     }
 
     void OnPreRender()
     {
-        if ((_ScreenResolution != new Vector2(Screen.width, Screen.height)) || (_Camera.fieldOfView != _OldFov) || (_OldStepDist != blurStepDistance))
+        if ((_ScreenResolution != new Vector2(_Camera.pixelWidth, _Camera.pixelHeight)) || (_Camera.fieldOfView != _OldFov) || (_OldStepDist != blurStepDistance))
             Cleanup();
 
         Initialize();
