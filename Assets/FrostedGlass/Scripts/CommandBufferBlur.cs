@@ -15,6 +15,9 @@ public class CommandBufferBlur : MonoBehaviour
 
     Vector2 _ScreenResolution = Vector2.zero;
     float _OldFov = 0;
+    float _OldStepDist = 0;
+
+    public float blurStepDistance = 0.1f;
 
     public void Cleanup()
     {
@@ -60,7 +63,7 @@ public class CommandBufferBlur : MonoBehaviour
 
         int numIterations = 4;
 
-        float stepSize = 0.1f / _Camera.fieldOfView;
+        float stepSize = blurStepDistance / _Camera.fieldOfView;
         Vector2 offsets = new Vector2(stepSize * Screen.height / Screen.width, stepSize);
 
         
@@ -95,11 +98,12 @@ public class CommandBufferBlur : MonoBehaviour
 
         _ScreenResolution = new Vector2(Screen.width, Screen.height);
         _OldFov = _Camera.fieldOfView;
+		_OldStepDist = blurStepDistance;
     }
 
     void OnPreRender()
     {
-        if ((_ScreenResolution != new Vector2(Screen.width, Screen.height)) || (_Camera.fieldOfView != _OldFov))
+        if ((_ScreenResolution != new Vector2(Screen.width, Screen.height)) || (_Camera.fieldOfView != _OldFov) || (_OldStepDist != blurStepDistance))
             Cleanup();
 
         Initialize();
