@@ -2,10 +2,10 @@
 using UnityEngine.Rendering;
 
 [ExecuteInEditMode]
+[ImageEffectAllowedInSceneView]
 [RequireComponent(typeof(Camera))]
 public class CommandBufferBlur : MonoBehaviour
 {
-    [SerializeField]
     Shader _Shader;
 
     Material _Material = null;
@@ -14,6 +14,7 @@ public class CommandBufferBlur : MonoBehaviour
     CommandBuffer _CommandBuffer = null;
 
     Vector2 _ScreenResolution = Vector2.zero;
+    RenderTextureFormat _TextureFormat = RenderTextureFormat.ARGB32;
     float _OldFov = 0;
     float _OldStepDist = 0;
 
@@ -24,7 +25,7 @@ public class CommandBufferBlur : MonoBehaviour
         if (!Initialized)
             return;
 
-        _Camera.RemoveCommandBuffer(CameraEvent.AfterSkybox, _CommandBuffer);
+        _Camera.RemoveCommandBuffer(CameraEvent.BeforeForwardAlpha, _CommandBuffer);
         _CommandBuffer = null;
         Object.DestroyImmediate(_Material);
     }
@@ -50,6 +51,14 @@ public class CommandBufferBlur : MonoBehaviour
         if (Initialized)
             return;
 
+        if (!_Shader)
+        {
+            _Shader = Shader.Find("Hidden/SeparableGlassBlur");
+
+            if (!_Shader)
+                throw new MissingReferenceException("Unable to find required shader \"Hidden/SeparableGlassBlur\"");
+        }
+
         if (!_Material)
         {
             _Material = new Material(_Shader);
@@ -57,6 +66,9 @@ public class CommandBufferBlur : MonoBehaviour
         }
 
         _Camera = GetComponent<Camera>();
+
+        if (_Camera.allowHDR && SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.DefaultHDR))
+            _TextureFormat = RenderTextureFormat.DefaultHDR;
 
         _CommandBuffer = new CommandBuffer();
         _CommandBuffer.name = "Blur screen";
@@ -71,7 +83,7 @@ public class CommandBufferBlur : MonoBehaviour
         for (int i = 0; i < numIterations; ++i)
         {
             int screenCopyID = Shader.PropertyToID("_ScreenCopyTexture");
-            _CommandBuffer.GetTemporaryRT(screenCopyID, -1, -1, 0, FilterMode.Bilinear);
+            _CommandBuffer.GetTemporaryRT(screenCopyID, -1, -1, 0, FilterMode.Bilinear, _TextureFormat);
             _CommandBuffer.Blit(BuiltinRenderTextureType.CurrentActive, screenCopyID);
 
             int curSize = (int)Mathf.Pow(2,i);
@@ -80,8 +92,8 @@ public class CommandBufferBlur : MonoBehaviour
 
             int blurredID = Shader.PropertyToID("_Grab" + i + "_Temp1");
             int blurredID2 = Shader.PropertyToID("_Grab" + i + "_Temp2");
-            _CommandBuffer.GetTemporaryRT(blurredID, curW, curH, 0, FilterMode.Bilinear);
-            _CommandBuffer.GetTemporaryRT(blurredID2, curW, curH, 0, FilterMode.Bilinear);
+            _CommandBuffer.GetTemporaryRT(blurredID, curW, curH, 0, FilterMode.Bilinear, _TextureFormat);
+            _CommandBuffer.GetTemporaryRT(blurredID2, curW, curH, 0, FilterMode.Bilinear, _TextureFormat);
 
             _CommandBuffer.Blit(screenCopyID, blurredID);
             _CommandBuffer.ReleaseTemporaryRT(screenCopyID);
@@ -94,7 +106,7 @@ public class CommandBufferBlur : MonoBehaviour
             _CommandBuffer.SetGlobalTexture("_GrabBlurTexture_" + i, blurredID);
         }
 
-        _Camera.AddCommandBuffer(CameraEvent.AfterSkybox, _CommandBuffer);
+        _Camera.AddCommandBuffer(CameraEvent.BeforeForwardAlpha, _CommandBuffer);
 
         _ScreenResolution = new Vector2(_Camera.pixelWidth, _Camera.pixelHeight);
         _OldFov = _Camera.fieldOfView;
