@@ -2,7 +2,9 @@
 {
 	Properties
 	{
-		_FrostTex ("Fross Texture", 2D) = "white" {}
+		_FrostTex ("Frost Texture", 2D) = "white" {}
+		[Normal] _FrostNormal("Frost Normal", 2D) = "bump" {}
+		_NormalIntensity("Normal Intensity", Float) = 1
 		_FrostIntensity ("Frost Intensity", Range(0.0, 1.0)) = 0.5
 	}
 	SubShader
@@ -32,6 +34,8 @@
 			};
 
 			sampler2D _FrostTex;
+			sampler2D _FrostNormal;
+			float _NormalIntensity;
 			float4 _FrostTex_ST;
 
 			float _FrostIntensity;
@@ -47,6 +51,7 @@
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uvfrost = TRANSFORM_TEX(v.uv, _FrostTex);
 				o.uvgrab = ComputeGrabScreenPos(o.vertex);
+
 				return o;
 			}
 			
@@ -58,10 +63,13 @@
 
 				half4 refraction;
 
-				half4 ref00 = tex2Dproj(_GrabBlurTexture_0, i.uvgrab);
-				half4 ref01 = tex2Dproj(_GrabBlurTexture_1, i.uvgrab);
-				half4 ref02 = tex2Dproj(_GrabBlurTexture_2, i.uvgrab);
-				half4 ref03 = tex2Dproj(_GrabBlurTexture_3, i.uvgrab);
+				half3 normal = UnpackNormalWithScale(tex2D(_FrostNormal, i.uvfrost), _NormalIntensity);
+
+				half4 off = float4(normal, 0);
+				half4 ref00 = tex2Dproj(_GrabBlurTexture_0, i.uvgrab + off);
+				half4 ref01 = tex2Dproj(_GrabBlurTexture_1, i.uvgrab + off);
+				half4 ref02 = tex2Dproj(_GrabBlurTexture_2, i.uvgrab + off);
+				half4 ref03 = tex2Dproj(_GrabBlurTexture_3, i.uvgrab + off);
 
 				float step00 = smoothstep(0.75, 1.00, surfSmooth);
 				float step01 = smoothstep(0.5, 0.75, surfSmooth);
@@ -69,11 +77,10 @@
 				float step03 = smoothstep(0.00, 0.05, surfSmooth);
 
 				refraction = lerp(ref03, lerp( lerp( lerp(ref03, ref02, step02), ref01, step01), ref00, step00), step03);
-				
+
 				return refraction;
 			}
 			ENDCG
 		}
 	}
 }
- 
