@@ -21,6 +21,8 @@ Shader "Hidden/SeparableGlassBlur" {
 	float4 offsets;
 	
 	sampler2D _MainTex;
+
+	half4 _MainTex_ST;
 	
 	v2f vert (appdata_img v) {
 		v2f o;
@@ -38,13 +40,13 @@ Shader "Hidden/SeparableGlassBlur" {
 	half4 frag (v2f i) : COLOR {
 		half4 color = float4 (0,0,0,0);
 
-		color += 0.40 * tex2D (_MainTex, i.uv);
-		color += 0.15 * tex2D (_MainTex, i.uv01.xy);
-		color += 0.15 * tex2D (_MainTex, i.uv01.zw);
-		color += 0.10 * tex2D (_MainTex, i.uv23.xy);
-		color += 0.10 * tex2D (_MainTex, i.uv23.zw);
-		color += 0.05 * tex2D (_MainTex, i.uv45.xy);
-		color += 0.05 * tex2D (_MainTex, i.uv45.zw);
+		color += 0.40 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv, _MainTex_ST));
+		color += 0.15 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv01.xy, _MainTex_ST));
+		color += 0.15 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv01.zw, _MainTex_ST));
+		color += 0.10 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv23.xy, _MainTex_ST));
+		color += 0.10 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv23.zw, _MainTex_ST));
+		color += 0.05 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv45.xy, _MainTex_ST));
+		color += 0.05 * tex2D (_MainTex, UnityStereoScreenSpaceUVAdjust(i.uv45.zw, _MainTex_ST));
 		
 		return color;
 	}
