@@ -3,9 +3,11 @@ unity-frosted-glass [![License](https://img.shields.io/badge/License-MIT-lightgr
 
 This code reproduce a frosted glass effect in Unity (as seen in DOOM 2k16). It uses a CommandBuffer attached to the main camera to render the scene in screen-space rendertextures. A grayscale mask is then used to sample between these rendertextures in order to apply the desired blur.
 
- ![screenshot](Screenshots/screen0.gif)
+ ![screenshot](~Screenshots/screen0.gif)
 
 * Updated by Nothke to support normal displacement
+
+ ![screenshot](~Screenshots/displacement.gif)
 
 Limitations
 ===============
