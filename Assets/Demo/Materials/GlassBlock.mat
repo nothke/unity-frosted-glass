@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: FrostedGlass
+  m_Name: GlassBlock
   m_Shader: {fileID: 4800000, guid: 1b382d19d5c513e4ba4e644078d43741, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -39,16 +39,12 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _FrossTex:
-        m_Texture: {fileID: 2800000, guid: 927c40066f8e9b443918415676a56ca8, type: 3}
-        m_Scale: {x: 2, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _FrostNormal:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 580df94bc8896b84ea9ff37ac88ddd3c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _FrostTex:
-        m_Texture: {fileID: 2800000, guid: 927c40066f8e9b443918415676a56ca8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1491c5ec344f3d840a6e33acce670bef, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -72,13 +68,13 @@ Material:
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
-    - _FrostIntensity: 0.5
+    - _FrostIntensity: 1
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NormalIntensity: 0.14
+    - _NormalIntensity: 0.56
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
